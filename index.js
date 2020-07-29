@@ -8,7 +8,9 @@ const Post = require('./models/post');
 const User = require('./models/user');
 
 const PORT = config.PORT || 5000;
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
+
+
 
 mongoose.connect(config.MONGO_URL,{
     useNewUrlParser: true,

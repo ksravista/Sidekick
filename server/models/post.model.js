@@ -8,6 +8,8 @@ const postSchema = mongoose.Schema({
     likes: Number,
     comments: Number
 
+}, {
+    versionKey: false
 });
 
 module.exports = mongoose.model('Post', postSchema);

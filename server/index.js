@@ -8,8 +8,11 @@ app.use(express.json());
 //const User = require('./models/user.model');
 
 const postRoutes = require('./routes/post');
+const userRoutes = require('./routes/user');
+
 
 app.use('/posts', postRoutes);
+app.use('/user', userRoutes);
 
 const PORT = config.PORT || 5000;
 

@@ -20,7 +20,6 @@ router.post('/signup', async (req, res)=>{
      });
 
      user.password = await bcrypt.hash(user.password, 10);
-
      try{
          let result =  await user.save();
          res.status(200).send({message: `Username ${result.userId} created`});
@@ -28,13 +27,12 @@ router.post('/signup', async (req, res)=>{
          res.status(500).send(err);
       }
    }
-
-
-
 });
 
-router.post('/login', (req, res) =>{
+router.post('/login', async (req, res) =>{
 
+    let user = await User.find({email: req.body.email});
+    res.status(200).send(user);
 
 });
 

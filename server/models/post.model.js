@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+//TODO: vadlidation
 const postSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     userId: {

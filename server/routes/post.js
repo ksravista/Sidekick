@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/post.model');
 const mongoose = require('mongoose'); 
-
+const tokenAuth = require('../middleware/token-auth');
 
 router.get('/', async (req, res)=>{
     const posts = await Post.find({});
@@ -13,10 +13,10 @@ router.get('/', async (req, res)=>{
     }
 });
 
-router.post('/post', async(req, res) =>{
+router.post('/post',tokenAuth, async(req, res) =>{
     const post = new Post({
         _id: mongoose.Types.ObjectId(),
-        userId: req.body.userId,
+        userId: req.userData.userId,
         title: req.body.title,
         body: req.body.body,
         likes: 0,
@@ -25,7 +25,9 @@ router.post('/post', async(req, res) =>{
 
     try{
         const result = await post.save();
-        res.status(200).send(result);
+        res.status(200).json({ 
+            message: 'post has been posted'
+    });
     }catch(err){
         res.status(500).send(err);
     }

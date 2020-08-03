@@ -10,6 +10,10 @@ const aws = require('aws-sdk');
 const uuid = require('uuid');
 const tokenAuth = require('../middleware/token-auth');
 
+//TODO: get all current user data. this includes likes and comments.
+//credentials + likes
+//add bio, website.
+//like a post
 
 const s3 = new aws.S3({
    accessKeyId: config.AWS.AWS_ACCESS_KEY_ID,

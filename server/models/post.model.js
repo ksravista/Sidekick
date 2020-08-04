@@ -12,11 +12,19 @@ const postSchema = mongoose.Schema({
         required: true
     },
     body: String,
-    likes: Number,
-    comments: Number
+    likes: {
+        type: Number,
+        min: 0
+    },
+    comments: {
+        type: Number,
+        min: 0
+    }
 
 }, {
     versionKey: false
 });
+
+
 
 module.exports = mongoose.model('Post', postSchema);

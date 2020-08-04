@@ -16,8 +16,10 @@ const userSchema = mongoose.Schema({
         required: true
     },
     profilePic: String
+
 }, {
-    versionKey: false
+    versionKey: false,
+    strict: false
 });
 
 module.exports = mongoose.model('User', userSchema);

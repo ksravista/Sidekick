@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user.model');
+const Like = require('../models/like.model');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -11,9 +12,49 @@ const uuid = require('uuid');
 const tokenAuth = require('../middleware/token-auth');
 
 //TODO: get all current user data. this includes likes and comments.
-//credentials + likes
-//add bio, website.
-//like a post
+//credentials + likes - DONE
+//add bio, website - DONE
+//like a post - DONE
+
+router.post('/userDetails', tokenAuth, async (req,res) => {
+   //TODO: validate website, bio and location
+   const updateInfo = {
+      bio: req.body.bio,
+      location: req.body.location,
+      website: req.body.website
+   }
+
+   try{
+      let doc = await User.findOneAndUpdate({userId: req.userData.userId}, updateInfo);
+      return res.status(201).json(doc);
+   }
+   catch(err){
+      console.log(err);
+      return res.status(404).json({err});
+   }
+});
+
+router.get('/userDetails', tokenAuth, async (req,res)=> {
+   try{
+      let userDetails = {};
+      let user = await User.findOne({userId: req.userData.userId}).lean();
+      delete user['password'];
+      userDetails.about = user;
+
+      
+      let docs = await Like.find({userId: req.userData.userId});
+      userDetails.likes = docs;
+      return res.status(200).json(userDetails);
+   }
+   catch(err){
+      console.log(err);
+      return res.status(404).json({err});
+   }
+
+})
+
+
+
 
 const s3 = new aws.S3({
    accessKeyId: config.AWS.AWS_ACCESS_KEY_ID,
@@ -37,7 +78,7 @@ router.post('/image', tokenAuth, upload.single('image'), (req, res)=>{
    const fileType = fileName[fileName.length - 1];
 
    if(fileType !== 'jpeg' && fileType !== 'png' && fileType !== 'jpg'){
-      res.status(400).send({error: 'only picture files allowed'});
+      return res.status(400).json({error: 'only picture files allowed'});
    }
    else{
       const params = {
@@ -48,10 +89,10 @@ router.post('/image', tokenAuth, upload.single('image'), (req, res)=>{
 
       s3.upload(params, (err, data) => {
          if(err){
-            res.status(500).json({message: 'error uploading file'});
+            return res.status(500).json({message: 'error uploading file'});
          }
          else{
-            res.status(201).json({
+            return res.status(201).json({
                message: 'image uploaded sucessfully', data});
          }
       });
@@ -65,7 +106,7 @@ router.post('/signup', async (req, res)=>{
    //check if userid and email exists
    let users = await User.find({ $or: [ { userId: req.body.userId }, { email: req.body.email } ] })
    if(users.length > 0){
-      return res.status(400).send({err: 'Username or email already taken'});
+      return res.status(400).json({err: 'Username or email already taken'});
    }else{
       let user = new User({
          _id: mongoose.Types.ObjectId(),
@@ -86,16 +127,16 @@ router.post('/signup', async (req, res)=>{
             },
             config.JWT_SECRET,
             {
-               expiresIn: "1hr"
+               expiresIn: "5hr"
             }
          );
-         res.status(200).json({
+         return res.status(200).json({
             message: `Username ${result.userId} created`,
             username: result.userId,
             token
          });
       }catch(err){
-         res.status(500).send(err);
+         return res.status(500).json(err);
       }
    }
 });
@@ -121,7 +162,7 @@ router.post('/login', async (req, res) =>{
                },
                config.JWT_SECRET,
                {
-                  expiresIn: "1hr"
+                  expiresIn: "5hr"
                }
             );
             res.status(200).json({
@@ -138,5 +179,6 @@ router.post('/login', async (req, res) =>{
 
     
 });
+
 
 module.exports = router;
